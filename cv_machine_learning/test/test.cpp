@@ -12,9 +12,12 @@
 #include <cxcore.h>
 #include <highgui.h>
 
+#include "commontest.h"
 #include "kmeans.h"
+#include "knn.h"
 
 #include <cstdio>
+
 
 int main(int argc, char** argv)
 {
@@ -33,36 +36,11 @@ int main(int argc, char** argv)
 	{
 		int k, cluster_count = cvRandInt(&rng)%MAX_CLUSTER+1;
 		int i, sample_count = cvRandInt(&rng)%1000+1;
-		CvMat* points = cvCreateMat(sample_count,1,CV_32FC2);
-		CvMat* clusters = cvCreateMat(sample_count,1,CV_32SC1);
 
-		/* generate random samples */
-		/* gaussian distribution */
-		for(k=0;k<cluster_count;k++)
-		{
-			CvPoint center;
-			CvMat point_chunk;
-			center.x = cvRandInt(&rng)%img->width;
-			center.y = cvRandInt(&rng)%img->height;
-			cvGetRows(points,&point_chunk,
-					k*sample_count/cluster_count,
-					k==cluster_count-1?sample_count:
-					(k+1)*sample_count/cluster_count);
-			cvRandArr(&rng,&point_chunk,CV_RAND_NORMAL,
-					cvScalar(center.x,center.y,0,0),
-					cvScalar(img->width/6,img->height/6,0,0));
-		}
-
-		/* shuffle samples */
-		for(i=0;i<sample_count/2;i++)
-		{
-			CvPoint2D32f* pt1 = (CvPoint2D32f*)points->data.fl +
-				cvRandInt(&rng)%sample_count;
-			CvPoint2D32f* pt2 = (CvPoint2D32f*)points->data.fl +
-				cvRandInt(&rng)%sample_count;
-			CvPoint2D32f temp;
-			CV_SWAP(*pt1,*pt2,temp);
-		}
+		CvMat* points;	// trainData
+		CvMat* clusters; // response
+		// gen samples
+		genClusterSamples(points,clusters,sample_count,cluster_count,CvSize(img->width,img->height));
 
 		printf("cluster_count: %d\nsample_count:%d\n\n",cluster_count,sample_count);
 /*
@@ -83,9 +61,8 @@ int main(int argc, char** argv)
 			cvCircle(img,cvPointFrom32f(pt),2,
 					color_tab[cluster_idx],CV_FILLED);
 		}
-//		printf("here\n");
-		cvReleaseMat(&points);
-		cvReleaseMat(&clusters);
+
+		releaseClusterSamples(points,clusters);
 
 		cvShowImage("clusters",img);
 

@@ -12,6 +12,7 @@
 #include <vector>
 using std::vector;
 
+
 /*
  * the main procedure of k-means algorithm,
  * the interface is nearly the same with cvKMeans2
