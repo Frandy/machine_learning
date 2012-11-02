@@ -72,11 +72,11 @@ bool CmpNeighbor(const Neighbor& a, const Neighbor& b)
 	return (a.dis<b.dis);
 }
 
-void InitKNeighbors(vector<Neighbor>& kneighbors, CvMat * trainData, CvPoint& sample, int maxK)
+void InitKNeighbors(vector<Neighbor>& kneighbors, CvMat* trainData, CvPoint& sample, int maxK)
 {
 	for(auto i=0;i<maxK;i++)
 	{
-		CvPoint tmp = cvPointFrom32f(((CvPoint2D32f*)samples->data.fl)[i]);
+		CvPoint tmp = cvPointFrom32f(((CvPoint2D32f*)trainData->data.fl)[i]);
 		double dis = getDis(tmp,sample);
 		Neighbor nneighbor;
 		nneighbor.index = i;
@@ -88,9 +88,9 @@ void InitKNeighbors(vector<Neighbor>& kneighbors, CvMat * trainData, CvPoint& sa
 
 void AddNewNeighbor(vector<Neighbor>& kneighbors, CvMat * trainData, int index, CvPoint& sample)
 {
-	CvPoint tmp = cvPointFrom32f(((CvPoint2D32f*)samples->data.fl)[index]);
+	CvPoint tmp = cvPointFrom32f(((CvPoint2D32f*)trainData->data.fl)[index]);
 	double dis = getDis(tmp,sample);
-	double maxd = kneighbors[0];	// the first one, as the heap-top
+	double maxd = kneighbors[0].dis;	// the first one, as the heap-top
 	if(dis<maxd)
 	{
 		pop_heap(kneighbors.begin(),kneighbors.end(),CmpNeighbor);
@@ -136,9 +136,9 @@ int MajorityLabel(vector<Neighbor>& kneighbors,CvMat * responses, int cluster_co
 
 int knearest(CvMat * trainData, CvMat * responses, int cluster_count, CvMat* samples, CvMat* sample_responses, int maxK)
 {
-	int sample_count = samples.rows;
+	int sample_count = samples->rows;
 //	assert(sample_count==1);
-	int data_count = trainData.rows;
+	int data_count = trainData->rows;
 	for(auto i=0;i<sample_count;i++)
 	{
 		CvPoint sample = cvPointFrom32f(((CvPoint2D32f*)samples->data.fl)[i]);

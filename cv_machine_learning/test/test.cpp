@@ -35,12 +35,12 @@ int main(int argc, char** argv)
 	for(;;)
 	{
 		int k, cluster_count = cvRandInt(&rng)%MAX_CLUSTER+1;
-		int i, sample_count = cvRandInt(&rng)%1000+1;
+		int i, sample_count = cvRandInt(&rng)%1000+10;
 
 		CvMat* points;	// trainData
 		CvMat* clusters; // response
 		// gen samples
-		genClusterSamples(points,clusters,sample_count,cluster_count,CvSize(img->width,img->height));
+		genClusterSamples(rng,points,clusters,sample_count,cluster_count,cvSize(img->width,img->height));
 
 		printf("cluster_count: %d\nsample_count:%d\n\n",cluster_count,sample_count);
 /*
@@ -53,14 +53,21 @@ int main(int argc, char** argv)
 //		printf("my k-means done.\n");
 		//clog << "my k-means done. " << endl;
 
+// to test knn
+		CvMat* test_samples;
+		CvMat* test_responses;
+		int test_sample_count = cvRandInt(&rng)%10+1;
+		int maxK = 5;
+		genTestClusterSamples(rng,test_samples,test_responses,test_sample_count,cvSize(img->width,img->height));
+
+		knearest(points,clusters,cluster_count,test_samples,test_responses,maxK);
+
+
 		cvZero(img);
-		for(i=0;i<sample_count;i++)
-		{
-			CvPoint2D32f pt = ((CvPoint2D32f*)points->data.fl)[i];
-			int cluster_idx = clusters->data.i[i];
-			cvCircle(img,cvPointFrom32f(pt),2,
-					color_tab[cluster_idx],CV_FILLED);
-		}
+		postPointImage(points, clusters, sample_count, img, color_tab);
+
+		postPointImage(test_samples,test_responses,test_sample_count,img,color_tab,8);
+
 
 		releaseClusterSamples(points,clusters);
 

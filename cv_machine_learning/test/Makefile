@@ -19,7 +19,7 @@ HEADERS = 	../common/commontest.h \
 
 INCLUDE_HEADER_PATH = -I ../common/ -I ../kmeans/ -I ../knn/
 
-SOURCES = 	../common/commontest.cpp \			
+SOURCES = 	../common/commontest.cpp \
 			../kmeans/kmeans.cpp \
 			../knn/knn.cpp \
 		  	test.cpp
